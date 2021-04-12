@@ -50,16 +50,12 @@ def handle_post(file_name, file_content, headers):
     return 'HTTP/1.1 200 OK\n\n' + file_content
 
 def fetch_file(file_name):
-    try: 
-        fin = open(file_name)
-        content = fin.read()
-        fin.close()
-        #time.sleep(2) #uncomment to simulate timeout (408)
+    fin = open(file_name)
+    content = fin.read()
+    fin.close()
+    time.sleep(2) #uncomment to simulate timeout (408)
 
-        return content
-    
-    except FileNotFoundError:
-        return 'HTTP/1.1 404 NOT FOUND\n\n'
+    return content
         
 # return handle_post(request)
 
@@ -67,9 +63,9 @@ def handle_request(request):
 
     # Get header of requested file 
     headers = request.split('\n')
-
     filename = ""
-    # Set a counter for getting request type
+    
+    #Set counter to get request method
     Count = 0
     for item in request.split():
         if Count == 0:
@@ -82,12 +78,16 @@ def handle_request(request):
         while True:
             #start timer 
             start = time.time()
-            content = fetch_file(filename)
+            try: 
+                content = fetch_file(filename)
+            except FileNotFoundError:
+                return 'HTTP/1.1 404 NOT FOUND\n\n 404 NOT FOUND'
+                break
             end = time.time()
 
             #timeout if exceed limit 
             if end - start > 1:
-                return  'HTTP/1.1 408 REQUEST TIMEOUT\n\n'
+                return  'HTTP/1.1 408 REQUEST TIMEOUT\n\n 408 REQUEST TIMED OUT'
             
             #call request method 
             if http_request_type == 'GET':
@@ -96,7 +96,7 @@ def handle_request(request):
                 return handle_post(filename, content, headers)
 
     else: #invalid file name
-        return 'HTTP/1.1 400 BAD REQUEST\n\n'
+        return 'HTTP/1.1 400 BAD REQUEST\n\n 400 BAD REQUEST'
 
 # Handle incoming client request 
 while True:
@@ -105,9 +105,10 @@ while True:
 
     # Get the  client request
     request = client_conn.recv(1024).decode()
-    print(request)
+    print(request.split('\n')[0])
     
     response = handle_request(request)
+    print(response.split('\n')[0])
        
     # Send HTTP response 
     client_conn.sendall(response.encode())
