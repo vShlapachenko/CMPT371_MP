@@ -107,11 +107,8 @@ while True:
     request = client_conn.recv(1024).decode()
     print(request)
     
-    try: 
-        response = handle_request(request)
-    except TimeoutError:
-        response = 'HTTP/1.1 408REQUEST TIME OUT\n\n Request Timed Out'
-        
+    response = handle_request(request)
+       
     # Send HTTP response 
     client_conn.sendall(response.encode())
     client_conn.close()
