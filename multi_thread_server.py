@@ -24,10 +24,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
 
-        # TODO: To test normal behavior comment out time methods
         start = time.time()
 
-        time.sleep(10)
+        # TODO: To test threding/408 behavior comment out time methods
+        # time.sleep(10)
 
         if time.time() - start > 9:
             self.send_error(TIMEOUT)
@@ -41,10 +41,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
 
-        # TODO: To test normal behavior comment out time methods
         start = time.time()
-        time.sleep(10)
-        if time.time() - start > 9:
+        # TODO: UNCOMMENT To test for threading/408 behavior comment out time methods
+        # time.sleep(10)
+        if time.time() - start > 1:
             self.send_error(TIMEOUT)
             return
 
