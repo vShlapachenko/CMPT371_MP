@@ -55,7 +55,6 @@ def fetch_file(file_name):
     fin = open(file_name)
     content = fin.read()
     fin.close()
-    time.sleep(2)  # uncomment to simulate timeout (408)
 
     return content
 
