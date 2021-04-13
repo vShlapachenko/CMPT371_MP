@@ -38,7 +38,7 @@ class Handler(BaseHTTPRequestHandler):
             # TODO: To test threading/408 behavior uncomment this method
             # time.sleep(10)
 
-            if time.time() - start > 9:
+            if time.time() - start > 1:
                 self.send_error(TIMEOUT)
                 return
             self.send_ok()
