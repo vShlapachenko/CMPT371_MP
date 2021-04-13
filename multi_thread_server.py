@@ -9,6 +9,8 @@ NOT_MODIFIED = 304
 
 BAD_REQUEST = 400
 
+NOT_FOUND = 404
+
 TIMEOUT = 408
 
 FILE_NAME = "test.html"
@@ -26,30 +28,30 @@ class Handler(BaseHTTPRequestHandler):
 
         start = time.time()
 
-        # TODO: To test threding/408 behavior comment out time methods
-        # time.sleep(10)
-
-        if time.time() - start > 9:
-            self.send_error(TIMEOUT)
-            return
-
-        if self.path != "/test.html":
+        if self.path == "/":
             self.send_error(BAD_REQUEST)
             return
+        elif self.path != "/test.html":
+            self.send_error(NOT_FOUND)
+            return
         else:
+            # TODO: To test threading/408 behavior uncomment this method
+            # time.sleep(10)
+
+            if time.time() - start > 9:
+                self.send_error(TIMEOUT)
+                return
             self.send_ok()
 
     def do_POST(self):
 
         start = time.time()
-        # TODO: UNCOMMENT To test for threading/408 behavior comment out time methods
-        # time.sleep(10)
-        if time.time() - start > 1:
-            self.send_error(TIMEOUT)
-            return
 
-        if self.path != "/test.html":
+        if self.path == "/":
             self.send_error(BAD_REQUEST)
+            return
+        elif self.path != "/test.html":
+            self.send_error(NOT_FOUND)
             return
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
@@ -79,6 +81,11 @@ class Handler(BaseHTTPRequestHandler):
         file = open(FILE_NAME, 'w')
         file.write(new_html_content)
         file.close()
+        # TODO: UNCOMMENT To test for threading/408 behavior comment out time methods
+        # time.sleep(10)
+        if time.time() - start > 1:
+            self.send_error(TIMEOUT)
+            return
         self.send_ok()
 
     @staticmethod
