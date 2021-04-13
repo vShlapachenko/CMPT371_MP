@@ -17,6 +17,7 @@ print('Server is listening on port %s ...' % PORT)
 def handle_get(file_content):
     return 'HTTP/1.1 200 OK\n\n' + file_content
 
+
 def handle_post(file_name, file_content, headers):
     # get content
     content_arr = headers[10:]
@@ -49,56 +50,63 @@ def handle_post(file_name, file_content, headers):
 
     return 'HTTP/1.1 200 OK\n\n' + file_content
 
+
 def fetch_file(file_name):
     fin = open(file_name)
     content = fin.read()
     fin.close()
-    time.sleep(2) #uncomment to simulate timeout (408)
+    time.sleep(2)  # uncomment to simulate timeout (408)
 
     return content
-        
+
+
 # return handle_post(request)
 
 def handle_request(request):
-
-    # Get header of requested file 
+    # Get header of requested file
     headers = request.split('\n')
     filename = ""
-    
-    #Set counter to get request method
+
+    # Set counter to get request method
     Count = 0
     for item in request.split():
         if Count == 0:
             http_request_type = item
         if item[0] == "/":
-            filename = item[1:]    
-        Count+= 1 
+            filename = item[1:]
+        Count += 1
 
     if filename != "":
         while True:
-            #start timer 
+            # start timer
             start = time.time()
-            try: 
+            try:
                 content = fetch_file(filename)
             except FileNotFoundError:
                 return 'HTTP/1.1 404 NOT FOUND\n\n 404 NOT FOUND'
                 break
-            end = time.time()
 
-            #timeout if exceed limit 
+            # TODO: to test threading/timeout please uncomment
+            # time.sleep(10)
+
+            end = time.time()
+            # #timeout if exceed limit
+
+            #TODO: If you want to test threding comment out next two lines
             if end - start > 1:
-                return  'HTTP/1.1 408 REQUEST TIMEOUT\n\n 408 REQUEST TIMED OUT'
-            
-            #call request method 
+                return 'HTTP/1.1 408 REQUEST TIMEOUT\n\n 408 REQUEST TIMED OUT'
+
+            # call request method
             if http_request_type == 'GET':
                 return handle_get(content)
             elif http_request_type == 'POST':
                 return handle_post(filename, content, headers)
 
-    else: #invalid file name
+    else:  # invalid file name
         return 'HTTP/1.1 400 BAD REQUEST\n\n 400 BAD REQUEST'
 
-# Handle incoming client request 
+
+# Handle incoming client request
 while True:
     # Wait for client connections
     client_conn, client_addr = server.accept()
@@ -106,10 +114,10 @@ while True:
     # Get the  client request
     request = client_conn.recv(1024).decode()
     print(request.split('\n')[0])
-    
+
     response = handle_request(request)
     print(response.split('\n')[0])
-       
+
     # Send HTTP response 
     client_conn.sendall(response.encode())
     client_conn.close()

@@ -38,6 +38,7 @@ class Handler(BaseHTTPRequestHandler):
             # TODO: To test threading/408 behavior uncomment this method
             # time.sleep(10)
 
+            #TODO: if you want to test threding comment out next 3 lines
             if time.time() - start > 1:
                 self.send_error(TIMEOUT)
                 return
@@ -83,6 +84,7 @@ class Handler(BaseHTTPRequestHandler):
         file.close()
         # TODO: UNCOMMENT To test for threading/408 behavior comment out time methods
         # time.sleep(10)
+        #TODO: if you want to test threading comment out next three lines
         if time.time() - start > 1:
             self.send_error(TIMEOUT)
             return
